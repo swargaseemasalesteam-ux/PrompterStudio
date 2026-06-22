@@ -4,471 +4,337 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PrompterStudio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Telugu:wght@400;500;700&family=Hind+Guntur:wght@400;500&family=Ramabhadra&display=swap" rel="stylesheet">
 <style>
-/* ══ TOKENS ══ */
-:root {
-  --bg:          #0c0c0f;
-  --surface:     #13131a;
-  --panel:       #1a1a24;
-  --border:      rgba(255,255,255,.07);
-  --border-hi:   rgba(255,255,255,.14);
-  --accent:      #5b6ef5;
-  --accent-dim:  rgba(91,110,245,.18);
-  --accent-glow: rgba(91,110,245,.35);
-  --text-1:      #f0f0f5;
-  --text-2:      #9898b0;
-  --text-3:      #555568;
-  --radius-sm:   6px;
-  --shadow:      0 4px 24px rgba(0,0,0,.5);
-  --font-ui:     'Inter', system-ui, sans-serif;
-  --font-mono:   'DM Mono', monospace;
-  --ease:        .18s cubic-bezier(.4,0,.2,1);
-}
+* { margin:0; padding:0; box-sizing:border-box; }
 
-/* ══ RESET ══ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  height: 100%; background: var(--bg); color: var(--text-1);
-  font-family: var(--font-ui); font-size: 14px;
-  overflow: hidden; -webkit-font-smoothing: antialiased;
-}
-
-/* ══ SHELL ══ */
-#app { display: flex; flex-direction: column; height: 100vh; }
-
-/* ══════════════════════════════════
-   TOPBAR
-══════════════════════════════════ */
-#topbar {
-  flex-shrink: 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0d0d10;
+  color: #f0f0f5;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  position: relative;
-  z-index: 20;
   overflow: hidden;
-  max-height: 200px;
-  transition: max-height .3s ease, opacity var(--ease);
-}
-#topbar.hidden {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
-  border-bottom-color: transparent;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Toolbar rows */
-.tb-row {
-  height: 44px;
-  min-height: 44px;
+/* ─── TOOLBAR ─── */
+#toolbar {
+  background: #131318;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: height .25s ease, opacity .2s ease;
+  height: 96px;
+  overflow: hidden;
+}
+#toolbar.hide { height: 0; opacity: 0; pointer-events: none; }
+
+.trow {
   display: flex;
   align-items: center;
-  padding: 0 14px;
+  height: 48px;
+  padding: 0 16px;
   gap: 8px;
   flex-shrink: 0;
 }
-.tb-row2 {
-  border-top: 1px solid var(--border);
-  background: rgba(0,0,0,.1);
+.trow:last-child {
+  border-top: 1px solid rgba(255,255,255,.06);
+  background: rgba(0,0,0,.15);
 }
 
 /* Logo */
-.logo {
-  display: flex; align-items: center; gap: 8px;
-  margin-right: 8px; flex-shrink: 0;
+.logo { display:flex; align-items:center; gap:8px; margin-right:4px; }
+.logo-icon {
+  width:28px; height:28px; background:#5b6ef5;
+  border-radius:7px; display:flex; align-items:center;
+  justify-content:center; font-size:15px; flex-shrink:0;
 }
-.logo-mark {
-  width: 28px; height: 28px;
-  background: var(--accent); border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
-}
-.logo-text { font-weight: 600; font-size: 13px; letter-spacing: .02em; white-space: nowrap; }
+.logo-name { font-weight:600; font-size:13px; white-space:nowrap; }
 
 /* Separator */
-.sep {
-  width: 1px; height: 20px;
-  background: var(--border-hi);
-  margin: 0 2px; flex-shrink: 0; align-self: center;
-}
+.sep { width:1px; height:20px; background:rgba(255,255,255,.1); flex-shrink:0; margin:0 3px; }
 
-/* Control group */
-.cg {
-  display: flex; align-items: center; gap: 5px;
-  height: 30px; flex-shrink: 0;
-}
-.cg-label {
-  font-size: 10px; font-weight: 500;
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--text-3); white-space: nowrap; line-height: 1;
-}
+/* Label */
+.lbl { font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:#444455; white-space:nowrap; }
 
 /* Range */
 input[type=range] {
-  -webkit-appearance: none; appearance: none;
-  width: 80px; height: 3px; margin: 0; padding: 0;
-  background: var(--border-hi); border-radius: 2px;
-  outline: none; cursor: pointer; flex-shrink: 0;
-}
-input[type=range]::-webkit-slider-runnable-track {
-  height: 3px; border-radius: 2px; background: var(--border-hi);
+  -webkit-appearance:none; appearance:none;
+  width:80px; height:3px; background:rgba(255,255,255,.12);
+  border-radius:2px; outline:none; cursor:pointer; flex-shrink:0; margin:0;
 }
 input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 13px; height: 13px; margin-top: -5px;
-  border-radius: 50%; background: var(--accent);
-  border: 2px solid var(--surface);
-  box-shadow: 0 0 0 1px var(--accent);
-  transition: box-shadow var(--ease);
+  -webkit-appearance:none; width:13px; height:13px;
+  margin-top:-5px; border-radius:50%; background:#5b6ef5;
+  border:2px solid #131318; cursor:pointer;
 }
-input[type=range]:hover::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--accent-glow); }
+input[type=range]::-webkit-slider-runnable-track { height:3px; }
 input[type=range]::-moz-range-thumb {
-  width: 13px; height: 13px; border-radius: 50%;
-  background: var(--accent); border: 2px solid var(--surface);
-  box-shadow: 0 0 0 1px var(--accent); cursor: pointer;
+  width:13px; height:13px; border-radius:50%;
+  background:#5b6ef5; border:2px solid #131318; cursor:pointer;
 }
 
-/* Value readout */
-.val {
-  font-family: var(--font-mono); font-size: 11px;
-  color: var(--text-2); min-width: 30px; text-align: right;
-  white-space: nowrap;
-}
+.val { font-size:11px; color:#888; min-width:32px; text-align:right; font-variant-numeric:tabular-nums; }
 
 /* Select */
 select {
-  appearance: none; -webkit-appearance: none;
-  background: var(--panel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555568'/%3E%3C/svg%3E") no-repeat right 7px center;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  color: var(--text-1); font-family: var(--font-ui); font-size: 12px;
-  height: 30px; padding: 0 24px 0 9px;
-  cursor: pointer; outline: none; flex-shrink: 0;
-  transition: border-color var(--ease);
+  -webkit-appearance:none; appearance:none;
+  background:#1e1e2a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23555'/%3E%3C/svg%3E") no-repeat right 7px center;
+  border:1px solid rgba(255,255,255,.1); border-radius:6px;
+  color:#f0f0f5; font-family:'Inter',sans-serif; font-size:12px;
+  height:28px; padding:0 22px 0 8px; cursor:pointer; outline:none; flex-shrink:0;
 }
-select:hover { border-color: var(--border-hi); }
-select:focus { border-color: var(--accent); }
+select:focus { border-color:#5b6ef5; }
 
 /* Color swatch */
-.color-wrap {
-  position: relative; width: 30px; height: 30px;
-  border-radius: var(--radius-sm); overflow: hidden;
-  border: 1px solid var(--border); cursor: pointer; flex-shrink: 0;
-  transition: border-color var(--ease);
+.swatch {
+  width:28px; height:28px; border-radius:6px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.12); flex-shrink:0; cursor:pointer; position:relative;
 }
-.color-wrap:hover { border-color: var(--border-hi); }
-.color-wrap input[type=color] {
-  position: absolute; inset: -4px;
-  width: calc(100% + 8px); height: calc(100% + 8px);
-  border: none; cursor: pointer; padding: 0;
+.swatch input[type=color] {
+  position:absolute; inset:-3px; width:calc(100%+6px); height:calc(100%+6px);
+  border:none; padding:0; cursor:pointer;
 }
 
 /* Icon button */
-.icon-btn {
-  width: 30px; height: 30px;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: transparent; color: var(--text-2);
-  font-size: 12px; line-height: 1; cursor: pointer; flex-shrink: 0;
-  transition: background var(--ease), border-color var(--ease), color var(--ease);
+.ib {
+  width:28px; height:28px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(255,255,255,.1); border-radius:6px;
+  background:transparent; color:#888; cursor:pointer;
+  transition:background .15s, color .15s, border-color .15s;
 }
-.icon-btn:hover { background: var(--panel); border-color: var(--border-hi); color: var(--text-1); }
-.icon-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-.icon-btn svg { pointer-events: none; }
+.ib:hover { background:#1e1e2a; color:#f0f0f5; border-color:rgba(255,255,255,.18); }
+.ib.on { background:rgba(91,110,245,.2); border-color:#5b6ef5; color:#5b6ef5; }
 
-/* Primary button */
-.btn-primary {
-  display: flex; align-items: center; gap: 6px;
-  height: 30px; padding: 0 14px;
-  background: var(--accent); border: none;
-  border-radius: var(--radius-sm); color: #fff;
-  font-family: var(--font-ui); font-size: 13px; font-weight: 600;
-  cursor: pointer; white-space: nowrap; flex-shrink: 0; line-height: 1;
-  transition: background var(--ease), box-shadow var(--ease), transform .1s;
+/* Play button */
+#btn-play {
+  display:flex; align-items:center; gap:6px;
+  height:28px; padding:0 14px;
+  background:#5b6ef5; border:none; border-radius:6px;
+  color:#fff; font-family:'Inter',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; flex-shrink:0; white-space:nowrap;
+  transition:background .15s, transform .1s;
 }
-.btn-primary:hover { background: #6b7ef8; box-shadow: 0 0 0 3px var(--accent-glow); }
-.btn-primary:active { transform: scale(.97); }
-.btn-primary.playing {
-  background: var(--panel); border: 1px solid var(--border); color: var(--text-1);
-}
-.btn-primary.playing:hover { background: #222233; }
+#btn-play:hover { background:#6b7ef8; }
+#btn-play:active { transform:scale(.97); }
+#btn-play.paused { background:#1e1e2a; border:1px solid rgba(255,255,255,.1); color:#f0f0f5; }
 
-/* Tooltip */
-[data-tip] { position: relative; }
-[data-tip]:hover::after {
-  content: attr(data-tip);
-  position: absolute; bottom: calc(100% + 7px); left: 50%;
-  transform: translateX(-50%);
-  background: #1e1e2e; border: 1px solid var(--border-hi);
-  border-radius: 5px; padding: 4px 8px;
-  font-size: 11px; color: var(--text-2); white-space: nowrap;
-  pointer-events: none; z-index: 100;
-}
+/* Flex row inline controls */
+.cg { display:flex; align-items:center; gap:5px; flex-shrink:0; }
 
-/* ══════════════════════════════════
-   EDIT DRAWER
-══════════════════════════════════ */
-#edit-drawer {
-  flex-shrink: 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height .3s cubic-bezier(.4,0,.2,1);
-}
-#edit-drawer.open { max-height: 180px; }
-#edit-drawer textarea {
-  width: 100%; height: 180px;
-  background: transparent; border: none; outline: none;
-  color: var(--text-1); font-family: var(--font-ui);
-  font-size: 13px; line-height: 1.6;
-  padding: 14px 20px; resize: none;
-}
-#edit-drawer textarea::placeholder { color: var(--text-3); }
-
-/* ══════════════════════════════════
-   STAGE
-══════════════════════════════════ */
+/* ─── STAGE ─── */
 #stage {
-  flex: 1; min-height: 0;
-  position: relative; overflow: hidden;
-  background: var(--bg); cursor: text;
+  flex: 1;
+  min-height: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  background: #0d0d10;
+  position: relative;
+  cursor: text;
+}
+#stage::-webkit-scrollbar { display: none; }
+
+/* ─── PROMPTER TEXT ─── */
+#text {
+  font-family: 'Noto Sans Telugu', 'Hind Guntur', sans-serif;
+  font-size: 52px;
+  font-weight: 400;
+  line-height: 1.8;
+  color: #ffffff;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  letter-spacing: 0;
+  outline: none;
+  caret-color: #5b6ef5;
+  /* padding: top so first line is in clear view,
+     sides by margin control, bottom so last line scrolls to centre */
+  padding: 56px 12% 60vh;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Inner scroll container — we move this with translateY */
-#scroll-content {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  /* padding-top: pushes first line into clear view
-     padding-bottom: ensures last line scrolls fully into view */
-  padding: 60px 12% 80vh;
-  will-change: transform;
-}
+/* Mirror text only */
+#stage.mirror #text { transform: scaleX(-1); display: block; }
 
-/* The editable text */
-#prompter-text {
-  font-size: 52px; font-weight: 300;
-  line-height: 1.6; color: #ffffff;
-  white-space: pre-wrap; word-break: break-word;
-  text-align: center; letter-spacing: .01em;
-  outline: none; caret-color: var(--accent);
-  transition: font-size .15s, line-height .15s, color .15s;
+/* ─── FIXED OVERLAYS ─── */
+/* progress at very bottom of viewport stage area */
+#progress {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: rgba(255,255,255,.06);
+  z-index: 100;
 }
+#progress-fill { height:100%; width:0%; background:#5b6ef5; transition:width .1s linear; }
 
-/* Focus ring while editing */
-#prompter-text:focus-visible {
-  box-shadow: 0 0 0 1px rgba(91,110,245,.2);
-  border-radius: 4px;
+/* HUD */
+#hud-l, #hud-r {
+  position: fixed;
+  top: 8px;
+  font-size: 11px; font-family: monospace;
+  color: rgba(255,255,255,.15);
+  z-index: 100; pointer-events: none;
 }
+#hud-l { left: 14px; }
+#hud-r { right: 14px; }
 
-/* Mirror */
-#stage.mirror #scroll-content { transform-origin: center top; }
-#stage.mirror { transform: scaleX(-1); }
-/* un-mirror the HUD overlays */
-#stage.mirror #hud-speed,
-#stage.mirror #hud-pos,
-#stage.mirror #hud-hint,
-#stage.mirror #prog-track,
-#stage.mirror #countdown-overlay,
-#stage.mirror #focus-band,
-#stage.mirror #fade-top,
-#stage.mirror #fade-bot { transform: scaleX(-1); }
-
-/* ── Progress bar ── */
-#prog-track {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px; background: rgba(255,255,255,.05); z-index: 8;
-}
-#prog-fill { height: 100%; background: var(--accent); width: 0%; transition: width .1s linear; }
-
-/* ── HUD ── */
-#hud-speed, #hud-pos {
-  position: absolute; top: 12px;
-  font-family: var(--font-mono); font-size: 11px;
-  color: rgba(255,255,255,.18); z-index: 7; letter-spacing: .05em;
-  pointer-events: none;
-}
-#hud-speed { left: 16px; }
-#hud-pos   { right: 16px; }
-#hud-hint {
-  position: absolute; bottom: 12px; left: 50%;
+#hint {
+  position: fixed;
+  bottom: 10px; left: 50%;
   transform: translateX(-50%);
-  font-size: 11px; color: rgba(255,255,255,.12);
-  white-space: nowrap; z-index: 7; pointer-events: none;
+  font-size: 11px; color: rgba(255,255,255,.1);
+  white-space: nowrap; z-index: 100; pointer-events: none;
 }
 
-/* ── Focus band ── */
-#focus-band {
-  position: absolute; inset: 0;
-  pointer-events: none; display: none; z-index: 5;
-}
-#focus-dim-top {
-  position: absolute; top: 0; left: 0; right: 0;
-  background: rgba(0,0,0,.55); backdrop-filter: blur(1px);
-}
-#focus-dim-bot {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,.55); backdrop-filter: blur(1px);
+/* Focus band */
+#focus-top, #focus-bot {
+  position: fixed;
+  left: 0; right: 0;
+  background: rgba(0,0,0,.62);
+  pointer-events: none; z-index: 90; display: none;
 }
 #focus-line {
-  position: absolute; left: 6%; right: 6%; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
-  opacity: .65;
+  position: fixed; left: 5%; right: 5%; height: 2px;
+  background: linear-gradient(90deg, transparent, #5b6ef5 20%, #5b6ef5 80%, transparent);
+  opacity: .55; pointer-events: none; z-index: 91; display: none;
 }
 
-/* ── Edge fades ── */
-#fade-top, #fade-bot {
-  position: absolute; left: 0; right: 0; height: 90px;
-  pointer-events: none; z-index: 4; display: none;
+/* Edge fades */
+#fade-t, #fade-b {
+  position: fixed; left: 0; right: 0; height: 80px;
+  pointer-events: none; z-index: 92; display: none;
 }
-#fade-top { top: 0; }
-#fade-bot { bottom: 0; }
 
-/* ── Countdown ── */
-#countdown-overlay {
-  position: absolute; inset: 0;
+/* Countdown */
+#countdown {
+  position: fixed; inset: 0;
   display: none; align-items: center; justify-content: center;
-  background: rgba(12,12,15,.82); backdrop-filter: blur(8px);
-  z-index: 30;
+  background: rgba(13,13,16,.88); backdrop-filter: blur(8px);
+  z-index: 200;
 }
-#countdown-overlay.show { display: flex; }
-#countdown-num {
-  font-size: 130px; font-weight: 700; color: var(--text-1); line-height: 1;
-  animation: cdpop .85s ease-in-out;
+#countdown.show { display: flex; }
+#cd-n {
+  font-size: 140px; font-weight: 700; color: #fff; line-height: 1;
+  animation: cdpop .85s ease;
 }
 @keyframes cdpop {
-  0%   { transform: scale(1.4); opacity: 0; }
-  25%  { transform: scale(1);   opacity: 1; }
-  80%  { opacity: 1; }
-  100% { opacity: 0; }
+  0%   { opacity:0; transform:scale(1.5); }
+  30%  { opacity:1; transform:scale(1); }
+  80%  { opacity:1; }
+  100% { opacity:0; }
 }
 
-/* ══════════════════════════════════
-   SHORTCUTS MODAL
-══════════════════════════════════ */
-#modal-overlay {
+/* ─── MODAL ─── */
+#modal {
   display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
-  z-index: 200; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+  z-index: 500; align-items: center; justify-content: center;
 }
-#modal-overlay.show { display: flex; }
-#modal-box {
-  background: var(--surface); border: 1px solid var(--border-hi);
-  border-radius: 14px; padding: 26px 30px 22px;
-  width: 420px; max-width: 92vw; box-shadow: var(--shadow);
+#modal.show { display: flex; }
+.mbox {
+  background: #131318; border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px; padding: 24px 28px 20px; width: 400px; max-width: 92vw;
 }
-.modal-title {
-  font-size: 14px; font-weight: 600; margin-bottom: 18px;
-  display: flex; align-items: center; justify-content: space-between;
+.mbox h2 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+.kgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.kr { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.kb {
+  font-family:monospace; font-size:11px;
+  background:#1e1e2a; border:1px solid rgba(255,255,255,.12);
+  border-radius:4px; padding:2px 7px; min-width:34px;
+  text-align:center; color:#aaa; flex-shrink:0;
 }
-.modal-title span { font-size: 11px; color: var(--text-3); font-weight: 400; }
-.keys-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
-.key-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 0; border-bottom: 1px solid var(--border);
+.kd { font-size:12px; color:#999; }
+.mclose {
+  margin-top:16px; width:100%; height:32px;
+  background:#5b6ef5; border:none; border-radius:6px;
+  color:#fff; font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer;
 }
-.key-badge {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
-  background: var(--panel); border: 1px solid var(--border-hi);
-  border-radius: 4px; padding: 2px 6px; min-width: 34px;
-  text-align: center; color: var(--text-2); flex-shrink: 0;
-}
-.key-desc { font-size: 12px; color: var(--text-2); }
-.modal-btn {
-  margin-top: 18px; width: 100%; height: 34px;
-  background: var(--accent); border: none; border-radius: var(--radius-sm);
-  color: #fff; font-family: var(--font-ui); font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: background var(--ease);
-}
-.modal-btn:hover { background: #6b7ef8; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
 </style>
 </head>
 <body>
-<div id="app">
 
-<!-- ══════════ TOPBAR ══════════ -->
-<div id="topbar">
-
-  <!-- Row 1: Playback + Speed + View toggles + Utility -->
-  <div class="tb-row">
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <!-- Row 1: Playback + Speed + View + Utility -->
+  <div class="trow">
     <div class="logo">
-      <div class="logo-mark">⌖</div>
-      <div class="logo-text">PrompterStudio</div>
+      <div class="logo-icon">⌖</div>
+      <div class="logo-name">PrompterStudio</div>
     </div>
     <div class="sep"></div>
 
-    <button class="btn-primary" id="btn-play" onclick="togglePlay()">
-      <svg id="play-icon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5l9 4.5-9 4.5z"/></svg>
-      <span id="play-label">Play</span>
+    <button id="btn-play" onclick="togglePlay()">
+      <svg id="picon" width="11" height="11" viewBox="0 0 11 11" fill="currentColor"><path d="M2 1l8 4.5L2 10z"/></svg>
+      <span id="plbl">Play</span>
     </button>
-    <button class="icon-btn" onclick="resetScroll()" data-tip="Reset (R)">
+    <button class="ib" onclick="doReset()" title="Reset (R)">
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6">
-        <polyline points="1,5 1,1 5,1"/><path d="M1,1 a5.5,5.5 0 1,1 -0.4,4.5"/>
+        <polyline points="1,5 1,1 5,1"/><path d="M1,1 a5.5,5.5 0 1,1 -0.5,5"/>
       </svg>
     </button>
-    <button class="icon-btn" onclick="startCountdown()" data-tip="Countdown then play">3…</button>
-
+    <button class="ib" onclick="startCD()" title="Countdown 3… play">3…</button>
     <div class="sep"></div>
 
     <div class="cg">
-      <span class="cg-label">Speed</span>
-      <input type="range" id="speed" min="10" max="300" value="60" oninput="onSpeed(this)">
-      <span class="val" id="val-speed">60</span>
+      <span class="lbl">Speed</span>
+      <input type="range" id="rspd" min="10" max="300" value="60" oninput="setSpeed(this)">
+      <span class="val" id="vspd">60</span>
     </div>
-
     <div class="sep"></div>
 
-    <button class="icon-btn" id="btn-mirror" onclick="toggleMirror()" data-tip="Mirror (M)">
-      <svg width="15" height="12" viewBox="0 0 15 12" fill="none" stroke="currentColor" stroke-width="1.5">
-        <line x1="7.5" y1="0" x2="7.5" y2="12"/>
-        <polyline points="1,3.5 3.5,6 1,8.5"/><polyline points="14,3.5 11.5,6 14,8.5"/>
+    <button class="ib" id="ib-mirror" onclick="toggleMirror()" title="Mirror (M)">
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.4">
+        <line x1="7.5" y1="0" x2="7.5" y2="11"/>
+        <polyline points="1,3 3.5,5.5 1,8"/>
+        <polyline points="14,3 11.5,5.5 14,8"/>
       </svg>
     </button>
-    <button class="icon-btn" id="btn-focus" onclick="toggleFocus()" data-tip="Focus band (Z)">
-      <svg width="15" height="12" viewBox="0 0 15 12" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="1" y="3.5" width="13" height="5" rx="1"/>
-        <line x1="2" y1="6" x2="13" y2="6" stroke-dasharray="2,1.5"/>
+    <button class="ib" id="ib-focus" onclick="toggleFocus()" title="Focus band (Z)">
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="1" y="3" width="13" height="5" rx="1"/>
+        <line x1="2" y1="5.5" x2="13" y2="5.5" stroke-dasharray="2,2"/>
       </svg>
     </button>
-    <button class="icon-btn" id="btn-fade" onclick="toggleFade()" data-tip="Edge fade (G)">
-      <svg width="15" height="12" viewBox="0 0 15 12" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="1" y="1" width="13" height="10" rx="2"/>
-        <line x1="1" y1="3.5" x2="14" y2="3.5" stroke-opacity=".5"/>
-        <line x1="1" y1="8.5" x2="14" y2="8.5" stroke-opacity=".5"/>
+    <button class="ib" id="ib-fade" onclick="toggleFade()" title="Edge fade (G)">
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="1" y="1" width="13" height="9" rx="1.5"/>
+        <line x1="1" y1="3" x2="14" y2="3" stroke-opacity=".35"/>
+        <line x1="1" y1="8" x2="14" y2="8" stroke-opacity=".35"/>
       </svg>
     </button>
-    <button class="icon-btn" id="btn-edit" onclick="toggleEdit()" data-tip="Edit script (E)">
-      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M1.5 9.5V11.5h2L10 5l-2-2-6.5 6.5z"/>
-        <path d="M8.5 2.5l2 2"/>
+    <button class="ib" id="ib-edit" onclick="toggleEdit()" title="Edit script (E)">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M1.5 9.5V11.5h2L10 5l-2-2z"/><path d="M8.5 2.5l2 2"/>
       </svg>
     </button>
-
     <div class="sep"></div>
 
-    <button class="icon-btn" onclick="showKeys()" data-tip="Keyboard shortcuts (?)">
-      <svg width="13" height="11" viewBox="0 0 13 11" fill="none" stroke="currentColor" stroke-width="1.4">
-        <rect x="1" y="1" width="11" height="9" rx="2"/>
+    <button class="ib" onclick="showModal()" title="Shortcuts (?)">
+      <svg width="13" height="11" viewBox="0 0 13 11" fill="none" stroke="currentColor" stroke-width="1.3">
+        <rect x=".8" y=".8" width="11.4" height="9.4" rx="2"/>
         <circle cx="3.5" cy="4" r=".6" fill="currentColor" stroke="none"/>
         <circle cx="6.5" cy="4" r=".6" fill="currentColor" stroke="none"/>
         <circle cx="9.5" cy="4" r=".6" fill="currentColor" stroke="none"/>
-        <rect x="3" y="6.5" width="7" height="1.2" rx=".6" fill="currentColor" stroke="none"/>
+        <rect x="3" y="6.5" width="7" height="1.1" rx=".5" fill="currentColor" stroke="none"/>
       </svg>
     </button>
-    <button class="icon-btn" id="btn-fs" onclick="toggleFullscreen()" data-tip="Fullscreen (F)">
-      <svg id="fs-icon" width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5">
-        <polyline points="1,4.5 1,1 4.5,1"/><polyline points="8.5,1 12,1 12,4.5"/>
-        <polyline points="12,8.5 12,12 8.5,12"/><polyline points="4.5,12 1,12 1,8.5"/>
+    <button class="ib" id="ib-fs" onclick="toggleFS()" title="Fullscreen (F)">
+      <svg id="fsicon" width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4">
+        <polyline points="1,4 1,1 4,1"/>
+        <polyline points="9,1 12,1 12,4"/>
+        <polyline points="12,9 12,12 9,12"/>
+        <polyline points="4,12 1,12 1,9"/>
       </svg>
     </button>
-    <button class="icon-btn" onclick="toggleToolbar()" data-tip="Hide toolbar (H)">
-      <svg width="13" height="9" viewBox="0 0 13 9" fill="none" stroke="currentColor" stroke-width="1.5">
+    <button class="ib" onclick="toggleBar()" title="Hide toolbar (H)">
+      <svg width="13" height="9" viewBox="0 0 13 9" fill="none" stroke="currentColor" stroke-width="1.4">
         <line x1="1" y1="1.5" x2="12" y2="1.5"/>
         <line x1="1" y1="4.5" x2="12" y2="4.5"/>
         <line x1="1" y1="7.5" x2="12" y2="7.5"/>
@@ -476,38 +342,42 @@ select:focus { border-color: var(--accent); }
     </button>
   </div>
 
-  <!-- Row 2: Typography + Layout + Colors -->
-  <div class="tb-row tb-row2">
+  <!-- Row 2: Typography -->
+  <div class="trow">
     <div class="cg">
-      <span class="cg-label">Size</span>
-      <input type="range" id="r-size" min="20" max="120" value="52" oninput="onFontSize(this)">
-      <span class="val" id="val-size">52px</span>
+      <span class="lbl">Size</span>
+      <input type="range" id="rsz" min="20" max="120" value="52" oninput="setSize(this)">
+      <span class="val" id="vsz">52px</span>
     </div>
     <div class="sep"></div>
 
     <div class="cg">
-      <span class="cg-label">Font</span>
-      <select id="r-font" onchange="onFont(this)">
-        <option value="'Inter',sans-serif">Inter</option>
-        <option value="Georgia,serif">Georgia</option>
-        <option value="Arial,sans-serif">Arial</option>
-        <option value="'DM Mono',monospace">Mono</option>
-        <option value="'Times New Roman',serif">Times New Roman</option>
-        <option value="Verdana,sans-serif">Verdana</option>
+      <span class="lbl">Font</span>
+      <select id="rfont" onchange="setFont(this)">
+        <optgroup label="Telugu">
+          <option value="'Noto Sans Telugu','Hind Guntur',sans-serif" selected>Noto Telugu</option>
+          <option value="'Hind Guntur',sans-serif">Hind Guntur</option>
+          <option value="'Ramabhadra',sans-serif">Ramabhadra</option>
+        </optgroup>
+        <optgroup label="Latin">
+          <option value="'Inter',sans-serif">Inter</option>
+          <option value="Georgia,serif">Georgia</option>
+          <option value="Arial,sans-serif">Arial</option>
+        </optgroup>
       </select>
     </div>
     <div class="sep"></div>
 
     <div class="cg">
-      <span class="cg-label">Line H</span>
-      <input type="range" id="r-lh" min="100" max="260" value="160" oninput="onLH(this)">
-      <span class="val" id="val-lh">1.6</span>
+      <span class="lbl">Line H</span>
+      <input type="range" id="rlh" min="100" max="260" value="180" oninput="setLH(this)">
+      <span class="val" id="vlh">1.8</span>
     </div>
     <div class="sep"></div>
 
     <div class="cg">
-      <span class="cg-label">Align</span>
-      <select id="r-align" onchange="onAlign(this)">
+      <span class="lbl">Align</span>
+      <select id="ralign" onchange="setAlign(this)">
         <option value="center">Center</option>
         <option value="left">Left</option>
         <option value="right">Right</option>
@@ -516,448 +386,331 @@ select:focus { border-color: var(--accent); }
     <div class="sep"></div>
 
     <div class="cg">
-      <span class="cg-label">Margin</span>
-      <input type="range" id="r-margin" min="2" max="35" value="12" oninput="onMargin(this)">
-      <span class="val" id="val-margin">12%</span>
+      <span class="lbl">Margin</span>
+      <input type="range" id="rmg" min="2" max="35" value="12" oninput="setMargin(this)">
+      <span class="val" id="vmg">12%</span>
     </div>
     <div class="sep"></div>
 
     <div class="cg">
-      <span class="cg-label">Text</span>
-      <div class="color-wrap"><input type="color" id="c-text" value="#ffffff" oninput="onTextColor(this)"></div>
+      <span class="lbl">Text</span>
+      <div class="swatch"><input type="color" id="ctxt" value="#ffffff" oninput="setTxtColor(this)"></div>
     </div>
     <div class="cg">
-      <span class="cg-label">BG</span>
-      <div class="color-wrap"><input type="color" id="c-bg" value="#0c0c0f" oninput="onBg(this)"></div>
+      <span class="lbl">BG</span>
+      <div class="swatch"><input type="color" id="cbg" value="#0d0d10" oninput="setBg(this)"></div>
     </div>
   </div>
-
-</div><!-- #topbar -->
-
-<!-- ══════════ EDIT DRAWER ══════════ -->
-<div id="edit-drawer">
-  <textarea id="script-input" placeholder="Paste or type your script here…" oninput="onScriptInput()">Welcome to PrompterStudio
-
-Replace this text with your own script. Paste in as many paragraphs as you need.
-
-Use the toolbar to set speed, font, colors, and layout before you start.
-
-Press Play or Space to begin. Good luck!</textarea>
 </div>
 
-<!-- ══════════ STAGE ══════════ -->
+<!-- EDIT DRAWER -->
+<div id="drawer" style="flex-shrink:0;max-height:0;overflow:hidden;background:#131318;border-bottom:1px solid rgba(255,255,255,.08);transition:max-height .25s ease;">
+  <textarea id="ta"
+    style="display:block;width:100%;height:160px;background:transparent;border:none;outline:none;color:#f0f0f5;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;padding:14px 18px;resize:none;"
+    placeholder="Paste your script here…"
+    oninput="syncText()"
+  >నమస్కారం! PrompterStudio కి స్వాగతం.
+
+మీ స్క్రిప్ట్‌ను ఇక్కడ పేస్ట్ చేయండి లేదా నేరుగా టైప్ చేయండి.
+
+Speed, Font, Size మరియు Colors సెట్ చేసుకుని Play నొక్కండి.
+
+మీ రికార్డింగ్‌కు శుభకామనలు!</textarea>
+</div>
+
+<!-- STAGE -->
 <div id="stage">
+  <div id="text"
+    contenteditable="true"
+    spellcheck="false"
+    autocorrect="off"
+    autocapitalize="off"
+  ></div>
+</div>
 
-  <!-- Focus band -->
-  <div id="focus-band">
-    <div id="focus-dim-top"></div>
-    <div id="focus-line"></div>
-    <div id="focus-dim-bot"></div>
-  </div>
+<!-- FIXED OVERLAYS -->
+<div id="progress"><div id="progress-fill"></div></div>
+<div id="hud-l">60 px/s</div>
+<div id="hud-r">0%</div>
+<div id="hint">Space — play · H — toolbar · ? — shortcuts</div>
+<div id="focus-top"></div>
+<div id="focus-line"></div>
+<div id="focus-bot"></div>
+<div id="fade-t"></div>
+<div id="fade-b"></div>
+<div id="countdown"><div id="cd-n">3</div></div>
 
-  <!-- Edge fades -->
-  <div id="fade-top"></div>
-  <div id="fade-bot"></div>
-
-  <!-- Scrollable content -->
-  <div id="scroll-content">
-    <div id="prompter-text"
-         contenteditable="true"
-         spellcheck="false"
-         autocorrect="off"
-         autocapitalize="off"></div>
-  </div>
-
-  <!-- Progress -->
-  <div id="prog-track"><div id="prog-fill"></div></div>
-
-  <!-- HUD -->
-  <div id="hud-speed">60 px/s</div>
-  <div id="hud-pos">0%</div>
-  <div id="hud-hint">Space — play/pause &nbsp;·&nbsp; H — hide toolbar &nbsp;·&nbsp; ? — shortcuts</div>
-
-  <!-- Countdown -->
-  <div id="countdown-overlay">
-    <div id="countdown-num">3</div>
-  </div>
-
-</div><!-- #stage -->
-</div><!-- #app -->
-
-<!-- ══════════ SHORTCUTS MODAL ══════════ -->
-<div id="modal-overlay" onclick="hideModal(event)">
-  <div id="modal-box">
-    <div class="modal-title">
-      Keyboard Shortcuts
-      <span>click outside to close</span>
+<!-- MODAL -->
+<div id="modal" onclick="if(event.target===this)hideModal()">
+  <div class="mbox">
+    <h2>⌨ Keyboard Shortcuts</h2>
+    <div class="kgrid">
+      <div class="kr"><span class="kb">Space</span><span class="kd">Play / Pause</span></div>
+      <div class="kr"><span class="kb">R</span><span class="kd">Reset to top</span></div>
+      <div class="kr"><span class="kb">↑ ↓</span><span class="kd">Manual scroll</span></div>
+      <div class="kr"><span class="kb">← →</span><span class="kd">Speed − / +</span></div>
+      <div class="kr"><span class="kb">+ −</span><span class="kd">Font size</span></div>
+      <div class="kr"><span class="kb">M</span><span class="kd">Mirror</span></div>
+      <div class="kr"><span class="kb">Z</span><span class="kd">Focus band</span></div>
+      <div class="kr"><span class="kb">G</span><span class="kd">Edge fade</span></div>
+      <div class="kr"><span class="kb">E</span><span class="kd">Edit panel</span></div>
+      <div class="kr"><span class="kb">F</span><span class="kd">Fullscreen</span></div>
+      <div class="kr"><span class="kb">H</span><span class="kd">Hide toolbar</span></div>
+      <div class="kr"><span class="kb">Esc</span><span class="kd">Close modal</span></div>
     </div>
-    <div class="keys-grid">
-      <div class="key-row"><span class="key-badge">Space</span><span class="key-desc">Play / Pause</span></div>
-      <div class="key-row"><span class="key-badge">R</span><span class="key-desc">Reset to top</span></div>
-      <div class="key-row"><span class="key-badge">↑ ↓</span><span class="key-desc">Scroll manually</span></div>
-      <div class="key-row"><span class="key-badge">← →</span><span class="key-desc">Speed –  / +</span></div>
-      <div class="key-row"><span class="key-badge">+ −</span><span class="key-desc">Font size</span></div>
-      <div class="key-row"><span class="key-badge">M</span><span class="key-desc">Mirror</span></div>
-      <div class="key-row"><span class="key-badge">Z</span><span class="key-desc">Focus band</span></div>
-      <div class="key-row"><span class="key-badge">G</span><span class="key-desc">Edge fade</span></div>
-      <div class="key-row"><span class="key-badge">E</span><span class="key-desc">Edit panel</span></div>
-      <div class="key-row"><span class="key-badge">F</span><span class="key-desc">Fullscreen</span></div>
-      <div class="key-row"><span class="key-badge">H</span><span class="key-desc">Hide toolbar</span></div>
-      <div class="key-row"><span class="key-badge">Esc</span><span class="key-desc">Close dialog</span></div>
-    </div>
-    <button class="modal-btn" onclick="document.getElementById('modal-overlay').classList.remove('show')">Done</button>
+    <button class="mclose" onclick="hideModal()">Done</button>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════
-//  STATE
-// ══════════════════════════════════
-let playing   = false;
-let scrollY   = 0;
-let animId    = null;
-let speed     = 60;
-let lastTs    = null;
-let mirrorOn  = false;
-let focusOn   = false;
-let fadeOn    = false;
-let tbHidden  = false;
-// Side-margin percentage (for left/right padding of scroll-content)
-let marginPct = 12;
+// ── STATE ──
+let playing=false, animId=null, lastTs=null, speed=60;
+let mirror=false, focusOn=false, fadeOn=false, barHidden=false;
+let marginPct=12;
 
-// ══════════════════════════════════
-//  DOM REFS
-// ══════════════════════════════════
-const stage     = document.getElementById('stage');
-const scContent = document.getElementById('scroll-content');
-const pText     = document.getElementById('prompter-text');
-const progFill  = document.getElementById('prog-fill');
-const hudSpeed  = document.getElementById('hud-speed');
-const hudPos    = document.getElementById('hud-pos');
-const focusBand = document.getElementById('focus-band');
-const focusDimT = document.getElementById('focus-dim-top');
-const focusDimB = document.getElementById('focus-dim-bot');
-const focusLine = document.getElementById('focus-line');
-const fadeTop   = document.getElementById('fade-top');
-const fadeBot   = document.getElementById('fade-bot');
-const topbar    = document.getElementById('topbar');
-const cdOverlay = document.getElementById('countdown-overlay');
-const cdNum     = document.getElementById('countdown-num');
-const scriptEl  = document.getElementById('script-input');
+// ── REFS ──
+const stage    = document.getElementById('stage');
+const text     = document.getElementById('text');
+const ta       = document.getElementById('ta');
+const pfill    = document.getElementById('progress-fill');
+const hudL     = document.getElementById('hud-l');
+const hudR     = document.getElementById('hud-r');
+const ftop     = document.getElementById('focus-top');
+const fbot     = document.getElementById('focus-bot');
+const fline    = document.getElementById('focus-line');
+const fadeT    = document.getElementById('fade-t');
+const fadeB    = document.getElementById('fade-b');
+const cdOv     = document.getElementById('countdown');
+const cdN      = document.getElementById('cd-n');
+const toolbar  = document.getElementById('toolbar');
+const drawer   = document.getElementById('drawer');
 
-// ══════════════════════════════════
-//  INIT
-// ══════════════════════════════════
-// Populate prompter-text from textarea initial value
-pText.textContent = scriptEl.value;
-applyMargin();
-updateFadeGradients();
+// ── INIT ──
+text.textContent = ta.value;
+setOverlayPos();
 
-// Sync: contenteditable → textarea
-pText.addEventListener('input', () => {
-  scriptEl.value = pText.innerText;
+// Sync contenteditable → textarea
+text.addEventListener('input', () => { ta.value = text.innerText; });
+text.addEventListener('keydown', e => {
+  if(e.key===' ') e.stopPropagation();
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.stopPropagation();
 });
 
-// Prevent shortcut keys from firing while typing in the prompter
-pText.addEventListener('keydown', e => {
-  if (e.key === ' ') e.stopPropagation();
-  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.stopPropagation();
-  // Ctrl+A / Cmd+A — let browser select only within the div (default)
-});
+// ── OVERLAY POSITIONING ──
+// All overlays are position:fixed — we pin them to the stage area
+function setOverlayPos() {
+  const r = stage.getBoundingClientRect();
+  const items = [
+    document.getElementById('progress'),
+    hudL, hudR,
+    document.getElementById('hint'),
+    ftop, fbot, fline, fadeT, fadeB,
+    cdOv
+  ];
+  // Set bounds for all fixed overlays
+  document.getElementById('progress').style.cssText +=
+    `;left:${r.left}px;right:${window.innerWidth-r.right}px;bottom:${window.innerHeight-r.bottom}px`;
+  hudL.style.top = (r.top+8)+'px';
+  hudL.style.left = (r.left+14)+'px';
+  hudR.style.top = (r.top+8)+'px';
+  hudR.style.right = (window.innerWidth-r.right+14)+'px';
+  const hint = document.getElementById('hint');
+  hint.style.bottom = (window.innerHeight-r.bottom+10)+'px';
+  hint.style.left = (r.left + r.width/2)+'px';
 
-// ══════════════════════════════════
-//  SCROLL ENGINE
-// ══════════════════════════════════
-function totalHeight()  { return scContent.scrollHeight; }
-function stageHeight()  { return stage.clientHeight; }
-function maxScroll()    { return Math.max(0, totalHeight() - stageHeight()); }
+  [ftop,fbot,fline,fadeT,fadeB].forEach(el => {
+    el.style.left = r.left+'px';
+    el.style.right = (window.innerWidth-r.right)+'px';
+  });
+  cdOv.style.left=r.left+'px'; cdOv.style.top=r.top+'px';
+  cdOv.style.width=r.width+'px'; cdOv.style.height=r.height+'px';
 
-function setScroll(y) {
-  scrollY = Math.max(0, Math.min(y, maxScroll()));
-  scContent.style.transform = `translateY(${-scrollY}px)`;
-  const pct = maxScroll() > 0 ? scrollY / maxScroll() : 0;
-  progFill.style.width = (pct * 100).toFixed(1) + '%';
-  hudPos.textContent = Math.round(pct * 100) + '%';
+  if(focusOn) updateFocusBand();
+  if(fadeOn)  updateFades();
 }
+window.addEventListener('resize', setOverlayPos);
+new ResizeObserver(setOverlayPos).observe(document.body);
+
+// ── SCROLL ──
+function maxScroll() { return Math.max(0, stage.scrollHeight - stage.clientHeight); }
+
+function updateProgress() {
+  const pct = maxScroll()>0 ? stage.scrollTop/maxScroll() : 0;
+  pfill.style.width = (pct*100).toFixed(1)+'%';
+  hudR.textContent = Math.round(pct*100)+'%';
+}
+
+stage.addEventListener('scroll', updateProgress, {passive:true});
+
+// accumulator holds sub-pixel remainder so slow speeds still scroll
+let scrollAcc = 0;
 
 function animate(ts) {
-  if (!lastTs) lastTs = ts;
-  const dt = Math.min((ts - lastTs) / 1000, 0.1); // cap dt to avoid jump after tab-switch
-  lastTs = ts;
-  setScroll(scrollY + speed * dt);
-  if (scrollY >= maxScroll()) { pause(); return; }
+  if(!lastTs) lastTs=ts;
+  const dt = Math.min((ts-lastTs)/1000, 0.1);
+  lastTs=ts;
+  scrollAcc += speed * dt;          // add fractional pixels
+  const whole = Math.floor(scrollAcc);
+  if(whole >= 1) {
+    const next = stage.scrollTop + whole;
+    scrollAcc -= whole;              // keep remainder
+    if(next >= maxScroll()) { stage.scrollTop=maxScroll(); pause(); return; }
+    stage.scrollTop = next;
+  }
   animId = requestAnimationFrame(animate);
 }
 
-// ══════════════════════════════════
-//  PLAYBACK
-// ══════════════════════════════════
+// ── PLAYBACK ──
 function play() {
-  playing = true; lastTs = null;
-  document.getElementById('btn-play').classList.add('playing');
-  document.getElementById('play-label').textContent = 'Pause';
-  document.getElementById('play-icon').innerHTML =
-    '<rect x="1.5" y="1.5" width="3" height="9" rx=".8"/><rect x="7.5" y="1.5" width="3" height="9" rx=".8"/>';
-  animId = requestAnimationFrame(animate);
+  playing=true; lastTs=null; scrollAcc=0;
+  const btn=document.getElementById('btn-play');
+  btn.classList.remove('paused');
+  document.getElementById('plbl').textContent='Pause';
+  document.getElementById('picon').innerHTML='<rect x="1" y="1" width="3.5" height="9" rx=".7"/><rect x="6.5" y="1" width="3.5" height="9" rx=".7"/>';
+  animId=requestAnimationFrame(animate);
 }
-
 function pause() {
-  playing = false;
-  if (animId) { cancelAnimationFrame(animId); animId = null; }
-  lastTs = null;
-  document.getElementById('btn-play').classList.remove('playing');
-  document.getElementById('play-label').textContent = 'Play';
-  document.getElementById('play-icon').innerHTML = '<path d="M2 1.5l9 4.5-9 4.5z"/>';
+  playing=false;
+  if(animId){cancelAnimationFrame(animId);animId=null;}
+  lastTs=null;
+  const btn=document.getElementById('btn-play');
+  btn.classList.add('paused');
+  document.getElementById('plbl').textContent='Play';
+  document.getElementById('picon').innerHTML='<path d="M2 1l8 4.5L2 10z"/>';
 }
+function togglePlay(){ playing ? pause() : play(); }
+function doReset(){ pause(); stage.scrollTop=0; pfill.style.width='0%'; hudR.textContent='0%'; }
 
-function togglePlay() { playing ? pause() : play(); }
-function resetScroll() { pause(); setScroll(0); }
-
-// ══════════════════════════════════
-//  CONTROLS
-// ══════════════════════════════════
-function onSpeed(el) {
-  speed = +el.value;
-  document.getElementById('val-speed').textContent = speed;
-  hudSpeed.textContent = speed + ' px/s';
-}
-
-function onFontSize(el) {
-  pText.style.fontSize = el.value + 'px';
-  document.getElementById('val-size').textContent = el.value + 'px';
-  if (focusOn) updateFocusBand();
-}
-
-function onFont(el) { pText.style.fontFamily = el.value; }
-
-function onLH(el) {
-  const v = (el.value / 100).toFixed(1);
-  pText.style.lineHeight = v;
-  document.getElementById('val-lh').textContent = v;
-  if (focusOn) updateFocusBand();
-}
-
-function onAlign(el) { pText.style.textAlign = el.value; }
-
-function applyMargin() {
-  // Always preserve the fixed top padding (60px), only change left/right
-  scContent.style.padding = `60px ${marginPct}% 80vh`;
-}
-
-function onMargin(el) {
-  marginPct = +el.value;
-  document.getElementById('val-margin').textContent = marginPct + '%';
-  applyMargin();
-}
-
-function onTextColor(el) { pText.style.color = el.value; }
-
-function onBg(el) {
-  stage.style.background = el.value;
-  updateFadeGradients();
-}
-
-function updateFadeGradients() {
-  const bg = document.getElementById('c-bg').value || '#0c0c0f';
-  fadeTop.style.background = `linear-gradient(to bottom, ${bg}, transparent)`;
-  fadeBot.style.background = `linear-gradient(to top, ${bg}, transparent)`;
-}
-
-// ══════════════════════════════════
-//  MIRROR
-// ══════════════════════════════════
-function toggleMirror() {
-  mirrorOn = !mirrorOn;
-  stage.classList.toggle('mirror', mirrorOn);
-  document.getElementById('btn-mirror').classList.toggle('active', mirrorOn);
-}
-
-// ══════════════════════════════════
-//  FOCUS BAND
-// ══════════════════════════════════
-function updateFocusBand() {
-  const h   = stageHeight();
-  const mid = h * 0.44;
-  const fs  = parseFloat(pText.style.fontSize) || 52;
-  const lh  = parseFloat(pText.style.lineHeight) || 1.6;
-  const band = fs * lh * 1.15;
-  const topH = Math.max(0, mid - band / 2);
-  const botH = Math.max(0, h - mid - band / 2);
-
-  focusDimT.style.height = topH + 'px';
-  focusDimB.style.height = botH + 'px';
-  focusLine.style.top    = mid + 'px';
-}
-
-function toggleFocus() {
-  focusOn = !focusOn;
-  focusBand.style.display = focusOn ? 'block' : 'none';
-  document.getElementById('btn-focus').classList.toggle('active', focusOn);
-  if (focusOn) updateFocusBand();
-}
-
-// ══════════════════════════════════
-//  EDGE FADE
-// ══════════════════════════════════
-function toggleFade() {
-  fadeOn = !fadeOn;
-  fadeTop.style.display = fadeOn ? 'block' : 'none';
-  fadeBot.style.display = fadeOn ? 'block' : 'none';
-  document.getElementById('btn-fade').classList.toggle('active', fadeOn);
-}
-
-// ══════════════════════════════════
-//  EDIT DRAWER
-// ══════════════════════════════════
-function toggleEdit() {
-  const d = document.getElementById('edit-drawer');
-  const open = d.classList.toggle('open');
-  document.getElementById('btn-edit').classList.toggle('active', open);
-  if (open) scriptEl.focus();
-}
-
-function onScriptInput() {
-  // Sync textarea → prompter-text, preserving scroll position
-  const saved = scrollY;
-  pText.textContent = scriptEl.value;
-  setScroll(saved);
-}
-
-// ══════════════════════════════════
-//  COUNTDOWN
-// ══════════════════════════════════
-function startCountdown() {
-  pause(); setScroll(0);
-  let n = 3;
-  cdNum.textContent = n;
-  cdOverlay.classList.add('show');
-  function tick() {
-    n--;
-    if (n > 0) {
-      // Re-trigger animation
-      cdNum.style.animation = 'none';
-      void cdNum.offsetWidth;
-      cdNum.style.animation = '';
-      cdNum.textContent = n;
-      setTimeout(tick, 900);
-    } else {
-      cdOverlay.classList.remove('show');
-      play();
+// ── CONTROLS ──
+function setSpeed(el){ speed=+el.value; document.getElementById('vspd').textContent=speed; hudL.textContent=speed+' px/s'; }
+function setSize(el){ text.style.fontSize=el.value+'px'; document.getElementById('vsz').textContent=el.value+'px'; if(focusOn) updateFocusBand(); }
+function setFont(el){
+  text.style.fontFamily=el.value;
+  if(/Telugu|Guntur|Rama/.test(el.value)){
+    text.style.letterSpacing='0';
+    if(parseFloat(text.style.lineHeight||1.8)<1.7){
+      text.style.lineHeight='1.8';
+      document.getElementById('rlh').value=180;
+      document.getElementById('vlh').textContent='1.8';
     }
   }
-  setTimeout(tick, 900);
+}
+function setLH(el){ const v=(el.value/100).toFixed(1); text.style.lineHeight=v; document.getElementById('vlh').textContent=v; if(focusOn) updateFocusBand(); }
+function setAlign(el){ text.style.textAlign=el.value; }
+function setMargin(el){ marginPct=+el.value; document.getElementById('vmg').textContent=marginPct+'%'; applyPadding(); }
+function applyPadding(){ text.style.padding=`56px ${marginPct}% 60vh`; }
+function setTxtColor(el){ text.style.color=el.value; }
+function setBg(el){ stage.style.background=el.value; if(fadeOn) updateFades(); }
+
+// ── TOGGLES ──
+function toggleMirror(){
+  mirror=!mirror;
+  stage.classList.toggle('mirror',mirror);
+  document.getElementById('ib-mirror').classList.toggle('on',mirror);
 }
 
-// ══════════════════════════════════
-//  TOOLBAR HIDE
-// ══════════════════════════════════
-function toggleToolbar() {
-  tbHidden = !tbHidden;
-  topbar.classList.toggle('hidden', tbHidden);
+function updateFocusBand(){
+  const r=stage.getBoundingClientRect();
+  const h=r.height, mid=r.top+h*0.44;
+  const fs=parseFloat(text.style.fontSize)||52;
+  const lh=parseFloat(text.style.lineHeight)||1.8;
+  const band=fs*lh*1.1;
+  ftop.style.top=r.top+'px'; ftop.style.height=Math.max(0,(mid-r.top)-band/2)+'px';
+  fbot.style.bottom=(window.innerHeight-r.bottom)+'px'; fbot.style.height=Math.max(0,(r.bottom-mid)-band/2)+'px';
+  fline.style.top=(mid-1)+'px';
+}
+function toggleFocus(){
+  focusOn=!focusOn;
+  const d=focusOn?'block':'none';
+  ftop.style.display=fbot.style.display=fline.style.display=d;
+  document.getElementById('ib-focus').classList.toggle('on',focusOn);
+  if(focusOn) updateFocusBand();
 }
 
-// ══════════════════════════════════
-//  FULLSCREEN
-// ══════════════════════════════════
-function toggleFullscreen() {
-  const icon = document.getElementById('fs-icon');
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-    icon.innerHTML = `<polyline points="4.5,1 1,1 1,4.5"/><polyline points="8.5,1 12,1 12,4.5"/>
-      <polyline points="12,8.5 12,12 8.5,12"/><polyline points="4.5,12 1,12 1,8.5"/>`;
+function updateFades(){
+  const bg=document.getElementById('cbg').value||'#0d0d10';
+  fadeT.style.background=`linear-gradient(to bottom,${bg},transparent)`;
+  fadeB.style.background=`linear-gradient(to top,${bg},transparent)`;
+  const r=stage.getBoundingClientRect();
+  fadeT.style.top=r.top+'px';
+  fadeB.style.bottom=(window.innerHeight-r.bottom)+'px';
+}
+function toggleFade(){
+  fadeOn=!fadeOn;
+  const d=fadeOn?'block':'none';
+  fadeT.style.display=fadeB.style.display=d;
+  document.getElementById('ib-fade').classList.toggle('on',fadeOn);
+  if(fadeOn) updateFades();
+}
+
+function toggleEdit(){
+  const open=drawer.style.maxHeight==='0px'||!drawer.style.maxHeight||drawer.style.maxHeight==='0';
+  drawer.style.maxHeight=open?'160px':'0px';
+  document.getElementById('ib-edit').classList.toggle('on',open);
+  if(open) ta.focus();
+}
+function syncText(){
+  const s=stage.scrollTop; text.textContent=ta.value; stage.scrollTop=s;
+}
+
+function toggleBar(){
+  barHidden=!barHidden;
+  toolbar.classList.toggle('hide',barHidden);
+  setTimeout(setOverlayPos,280);
+}
+
+// ── FULLSCREEN ──
+function toggleFS(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
   } else {
-    document.exitFullscreen();
-    icon.innerHTML = `<polyline points="1,4.5 1,1 4.5,1"/><polyline points="8.5,1 12,1 12,4.5"/>
-      <polyline points="12,8.5 12,12 8.5,12"/><polyline points="4.5,12 1,12 1,8.5"/>`;
+    document.exitFullscreen().catch(()=>{});
   }
 }
-
-// ══════════════════════════════════
-//  MODAL
-// ══════════════════════════════════
-function showKeys() { document.getElementById('modal-overlay').classList.add('show'); }
-function hideModal(e) {
-  if (e.target === document.getElementById('modal-overlay'))
-    document.getElementById('modal-overlay').classList.remove('show');
-}
-
-// ══════════════════════════════════
-//  KEYBOARD SHORTCUTS
-// ══════════════════════════════════
-document.addEventListener('keydown', e => {
-  // Skip if typing in any input/textarea/contenteditable
-  const ae = document.activeElement;
-  if (ae.tagName === 'TEXTAREA' || ae.tagName === 'INPUT' || ae.isContentEditable) return;
-
-  if (document.getElementById('modal-overlay').classList.contains('show')) {
-    if (e.key === 'Escape') document.getElementById('modal-overlay').classList.remove('show');
-    return;
+document.addEventListener('fullscreenchange',()=>{
+  const icon=document.getElementById('fsicon');
+  if(document.fullscreenElement){
+    icon.innerHTML=`<polyline points="4,1 1,1 1,4"/><polyline points="9,1 12,1 12,4"/><polyline points="12,9 12,12 9,12"/><polyline points="4,12 1,12 1,9"/>`;
+  } else {
+    icon.innerHTML=`<polyline points="1,4 1,1 4,1"/><polyline points="9,1 12,1 12,4"/><polyline points="12,9 12,12 9,12"/><polyline points="4,12 1,12 1,9"/>`;
   }
-
-  switch (e.key) {
-    case ' ':         e.preventDefault(); togglePlay(); break;
-    case 'ArrowUp':   e.preventDefault(); setScroll(scrollY - 80); break;
-    case 'ArrowDown': e.preventDefault(); setScroll(scrollY + 80); break;
-    case 'ArrowLeft': {
-      speed = Math.max(10, speed - 10);
-      const el = document.getElementById('speed');
-      el.value = speed; onSpeed(el); break;
-    }
-    case 'ArrowRight': {
-      speed = Math.min(300, speed + 10);
-      const el = document.getElementById('speed');
-      el.value = speed; onSpeed(el); break;
-    }
-    case 'r': case 'R': resetScroll(); break;
-    case 'm': case 'M': toggleMirror(); break;
-    case 'z': case 'Z': toggleFocus(); break;
-    case 'g': case 'G': toggleFade(); break;
-    case 'e': case 'E': toggleEdit(); break;
-    case 'f': case 'F': toggleFullscreen(); break;
-    case 'h': case 'H': toggleToolbar(); break;
-    case '?': showKeys(); break;
-    case '+': case '=': {
-      const r = document.getElementById('r-size');
-      r.value = Math.min(120, +r.value + 4); onFontSize(r); break;
-    }
-    case '-': case '_': {
-      const r = document.getElementById('r-size');
-      r.value = Math.max(20, +r.value - 4); onFontSize(r); break;
-    }
-    case 'Escape':
-      document.getElementById('modal-overlay').classList.remove('show'); break;
-  }
+  setTimeout(setOverlayPos,120);
 });
 
-// ══════════════════════════════════
-//  MOUSE WHEEL
-// ══════════════════════════════════
-stage.addEventListener('wheel', e => {
-  e.preventDefault();
-  setScroll(scrollY + e.deltaY * 1.2);
-}, { passive: false });
+// ── COUNTDOWN ──
+function startCD(){
+  doReset(); let n=3; cdN.textContent=n; cdOv.classList.add('show');
+  function tick(){ n--; if(n>0){ cdN.style.animation='none'; void cdN.offsetWidth; cdN.style.animation=''; cdN.textContent=n; setTimeout(tick,900); } else { cdOv.classList.remove('show'); play(); } }
+  setTimeout(tick,900);
+}
 
-// ══════════════════════════════════
-//  TOUCH
-// ══════════════════════════════════
-let touchY = null;
-stage.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
-stage.addEventListener('touchmove', e => {
-  if (touchY === null) return;
-  e.preventDefault();
-  const dy = touchY - e.touches[0].clientY;
-  setScroll(scrollY + dy);
-  touchY = e.touches[0].clientY;
-}, { passive: false });
-stage.addEventListener('touchend', () => { touchY = null; });
+// ── MODAL ──
+function showModal(){ document.getElementById('modal').classList.add('show'); }
+function hideModal(){ document.getElementById('modal').classList.remove('show'); }
 
-// ══════════════════════════════════
-//  RESIZE
-// ══════════════════════════════════
-window.addEventListener('resize', () => {
-  if (focusOn) updateFocusBand();
-  // Clamp scroll in case resize changed maxScroll
-  setScroll(scrollY);
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  const ae=document.activeElement;
+  if(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT'||ae.isContentEditable) return;
+  if(document.getElementById('modal').classList.contains('show')){ if(e.key==='Escape') hideModal(); return; }
+  switch(e.key){
+    case ' ':        e.preventDefault(); togglePlay(); break;
+    case 'ArrowUp':  e.preventDefault(); stage.scrollTop-=80; break;
+    case 'ArrowDown':e.preventDefault(); stage.scrollTop+=80; break;
+    case 'ArrowLeft':{ speed=Math.max(10,speed-10); const r=document.getElementById('rspd'); r.value=speed; setSpeed(r); break; }
+    case 'ArrowRight':{ speed=Math.min(300,speed+10); const r=document.getElementById('rspd'); r.value=speed; setSpeed(r); break; }
+    case 'r':case 'R': doReset(); break;
+    case 'm':case 'M': toggleMirror(); break;
+    case 'z':case 'Z': toggleFocus(); break;
+    case 'g':case 'G': toggleFade(); break;
+    case 'e':case 'E': toggleEdit(); break;
+    case 'f':case 'F': toggleFS(); break;
+    case 'h':case 'H': toggleBar(); break;
+    case '?': showModal(); break;
+    case 'Escape': hideModal(); break;
+    case '+':case '=':{const r=document.getElementById('rsz');r.value=Math.min(120,+r.value+4);setSize(r);break;}
+    case '-':case '_':{const r=document.getElementById('rsz');r.value=Math.max(20,+r.value-4);setSize(r);break;}
+  }
 });
 </script>
 </body>
